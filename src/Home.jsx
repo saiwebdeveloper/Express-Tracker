@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Home() {
@@ -8,6 +8,19 @@ function Home() {
   const [amount, setAmount] = useState("");
   const [expenses, setExpenses] = useState([]);
 
+  // 🔥 FORCE LOGOUT ON REFRESH / TAB CLOSE
+  useEffect(() => {
+    const handleRefresh = () => {
+      sessionStorage.removeItem("user");
+    };
+
+    window.addEventListener("beforeunload", handleRefresh);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleRefresh);
+    };
+  }, []);
+
   const addExpense = () => {
     if (!amount) return;
 
@@ -15,10 +28,10 @@ function Home() {
     setAmount("");
   };
 
-  // ✅ Correct logout
+  // ✅ Manual logout
   const logout = () => {
     sessionStorage.removeItem("user");
-    window.location.href = "/"; // full reset
+    window.location.href = "/";
   };
 
   const total = expenses.reduce((sum, e) => sum + e.amount, 0);
