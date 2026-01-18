@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 
-function ProtectedRoute({ children }) {
-  const user = localStorage.getItem("user");
+export default function ProtectedRoute({ children }) {
+  const user = sessionStorage.getItem("user");
 
   if (!user) {
     return <Navigate to="/" replace />;
@@ -9,5 +9,3 @@ function ProtectedRoute({ children }) {
 
   return children;
 }
-
-export default ProtectedRoute;
