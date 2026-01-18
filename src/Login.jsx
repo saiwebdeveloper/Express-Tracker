@@ -17,7 +17,10 @@ function Login() {
           <GoogleLogin
             onSuccess={(credentialResponse) => {
               const user = jwtDecode(credentialResponse.credential);
-              localStorage.setItem("user", JSON.stringify(user));
+
+              // ✅ logout on refresh
+              sessionStorage.setItem("user", JSON.stringify(user));
+
               navigate("/home");
             }}
             onError={() => {
