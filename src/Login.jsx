@@ -6,20 +6,33 @@ function Login() {
   const navigate = useNavigate();
 
   return (
-    <div style={{ marginTop: "100px", textAlign: "center" }}>
-      <h2>Sign in with Google</h2>
+    <div className="container vh-100 d-flex align-items-center justify-content-center">
+      <div className="card shadow-lg p-4" style={{ maxWidth: "400px", width: "100%" }}>
+        <div className="text-center mb-4">
+          <h3 className="fw-bold">Welcome Back 👋</h3>
+          <p className="text-muted mb-0">Sign in to continue</p>
+        </div>
 
-      <GoogleLogin
-        onSuccess={(credentialResponse) => {
-          const user = jwtDecode(credentialResponse.credential);
+        <div className="d-flex justify-content-center">
+          <GoogleLogin
+            onSuccess={(credentialResponse) => {
+              const user = jwtDecode(credentialResponse.credential);
+              localStorage.setItem("user", JSON.stringify(user));
+              navigate("/home");
+            }}
+            onError={() => {
+              console.log("Login Failed");
+            }}
+          />
+        </div>
 
-          localStorage.setItem("user", JSON.stringify(user));
-          navigate("/home");
-        }}
-        onError={() => {
-          console.log("Login Failed");
-        }}
-      />
+        <hr className="my-4" />
+
+        <p className="text-center text-muted small mb-0">
+          By signing in, you agree to our <span className="fw-semibold">Terms</span> &
+          <span className="fw-semibold"> Privacy Policy</span>
+        </p>
+      </div>
     </div>
   );
 }
