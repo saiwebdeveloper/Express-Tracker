@@ -1,6 +1,6 @@
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 function Login() {
@@ -35,20 +35,24 @@ function Login() {
           <p className="text-muted mb-0">Sign in to continue</p>
         </div>
 
-        <div className="d-flex justify-content-center">
+        <div className="d-flex justify-content-center mb-4">
           <GoogleLogin
             onSuccess={handleLoginSuccess}
-            onError={() => {
-              console.log("Login Failed");
-            }}
+            onError={() => console.log("Login Failed")}
           />
         </div>
 
         <hr className="my-4" />
 
         <p className="text-center text-muted small mb-0">
-          By signing in, you agree to our <span className="fw-semibold">Terms</span> &{" "}
-          <span className="fw-semibold">Privacy Policy</span>
+          By signing in, you agree to our{" "}
+          <Link to="/terms" className="fw-semibold text-decoration-underline">
+            Terms
+          </Link>{" "}
+          &{" "}
+          <Link to="/privacy-policy" className="fw-semibold text-decoration-underline">
+            Privacy Policy
+          </Link>
         </p>
       </div>
     </div>

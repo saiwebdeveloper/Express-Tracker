@@ -4,6 +4,10 @@ import { SpeedInsights } from "@vercel/speed-insights/react";
 import Login from "./Login";
 import Home from "./Home";
 import ProtectedRoute from "./ProtectedRoute";
+import Terms from "./Terms";
+import PrivacyPolicy from "./PrivacyPolicy";
+
+
 
 function App() {
   return (
@@ -18,6 +22,10 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Terms & Privacy Policy routes */}
+         <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       </Routes>
 
       {/* Vercel Speed Insights – global */}
@@ -27,4 +35,3 @@ function App() {
 }
 
 export default App;
-
