@@ -1,0 +1,80 @@
+.app {
+  min-height: 100vh;
+  background: #f8f9fa;
+  padding: 10px;
+}
+
+.dark {
+  background: #121212;
+  color: white;
+}
+
+.container {
+  max-width: 1100px;
+  margin: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.header button {
+  margin-left: 6px;
+}
+
+.selectors {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.card {
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.dark .card {
+  background: #1e1e1e;
+}
+
+.card input,
+.card select,
+.card button {
+  width: 100%;
+  margin-bottom: 6px;
+}
+
+.row-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.chart {
+  height: 260px;
+}
+
+/* 📱 Mobile */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .selectors {
+    flex-direction: column;
+  }
+
+  .chart {
+    height: 220px;
+  }
+}

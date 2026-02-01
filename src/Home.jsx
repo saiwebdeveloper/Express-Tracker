@@ -4,6 +4,11 @@ import { useNavigate } from "react-router-dom";
 function Home() {
   const navigate = useNavigate();
 
+  // User info
+  const [user, setUser] = useState({ name: "", email: "" });
+  const [loginTime, setLoginTime] = useState("");
+
+  // Expenses & theme
   const [category, setCategory] = useState("Bus");
   const [amount, setAmount] = useState("");
   const [expenses, setExpenses] = useState([]);
@@ -13,13 +18,21 @@ function Home() {
 
   const tableContainerRef = useRef(null);
 
-  // Load expenses
+  // Load user info and expenses
   useEffect(() => {
-    const savedExpenses = sessionStorage.getItem("expenses");
-    if (savedExpenses) {
-      setExpenses(JSON.parse(savedExpenses));
+    const storedUser = sessionStorage.getItem("user");
+    const storedTime = sessionStorage.getItem("loginTime");
+    if (!storedUser) {
+      navigate("/"); // if not logged in, redirect to login
+      return;
     }
-  }, []);
+
+    setUser(JSON.parse(storedUser));
+    setLoginTime(storedTime || "");
+
+    const savedExpenses = sessionStorage.getItem("expenses");
+    if (savedExpenses) setExpenses(JSON.parse(savedExpenses));
+  }, [navigate]);
 
   // Save expenses & auto-scroll
   useEffect(() => {
@@ -35,29 +48,29 @@ function Home() {
     sessionStorage.setItem("darkMode", darkMode);
   }, [darkMode]);
 
-  // ✅ FIXED FUNCTION
+  // Add new expense
   const addExpense = () => {
     if (!amount || Number(amount) <= 0) return;
-
-    setExpenses([
-      ...expenses,
-      { category, amount: Number(amount) }
-    ]);
-
+    setExpenses([...expenses, { category, amount: Number(amount) }]);
     setAmount("");
   };
 
+  // Delete expense
+  const deleteExpense = (index) => {
+    const updated = [...expenses];
+    updated.splice(index, 1);
+    setExpenses(updated);
+  };
+
+  // Logout
   const logout = () => {
     sessionStorage.clear();
     navigate("/");
   };
 
   const total = expenses.reduce((sum, e) => sum + e.amount, 0);
-
   const categoryTotal = (cat) =>
-    expenses
-      .filter((e) => e.category === cat)
-      .reduce((sum, e) => sum + e.amount, 0);
+    expenses.filter((e) => e.category === cat).reduce((sum, e) => sum + e.amount, 0);
 
   return (
     <div className={`min-vh-100 ${darkMode ? "dark-app" : "bg-light"}`}>
@@ -67,7 +80,15 @@ function Home() {
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h4 className="fw-bold mb-0">📊 Monthly Expenses</h4>
 
-          <div className="d-flex gap-2">
+          <div className="d-flex align-items-center gap-3">
+            {/* User info */}
+            <div className="d-flex flex-column text-end me-3">
+              <small className="text-muted">👤 {user.name}</small>
+              <small className="text-muted">📧 {user.email}</small>
+              <small className="text-muted">⏰ Logged in: {loginTime}</small>
+            </div>
+
+            {/* Theme toggle */}
             <button
               className="btn btn-outline-secondary btn-sm"
               onClick={() => setDarkMode(!darkMode)}
@@ -75,10 +96,8 @@ function Home() {
               {darkMode ? "☀️" : "🌙"}
             </button>
 
-            <button
-              className="btn btn-outline-danger btn-sm"
-              onClick={logout}
-            >
+            {/* Logout */}
+            <button className="btn btn-outline-danger btn-sm" onClick={logout}>
               Logout
             </button>
           </div>
@@ -112,12 +131,7 @@ function Home() {
                   onChange={(e) => setAmount(e.target.value)}
                 />
 
-                {/* ✅ FIXED BUTTON */}
-                <button
-                  className="btn btn-primary w-100"
-                  onClick={addExpense}
-                  disabled={!amount}
-                >
+                <button className="btn btn-primary w-100" onClick={addExpense} disabled={!amount}>
                   Add Expense
                 </button>
               </div>
@@ -134,15 +148,12 @@ function Home() {
               >
                 <h6 className="fw-semibold mb-3">🧾 Expenses</h6>
 
-                <table
-                  className={`table mb-0 ${
-                    darkMode ? "dark-table" : "table-bordered"
-                  }`}
-                >
+                <table className={`table mb-0 ${darkMode ? "dark-table" : "table-bordered"}`}>
                   <thead>
                     <tr>
                       <th>Category</th>
                       <th>₹</th>
+                      <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -150,15 +161,18 @@ function Home() {
                       <tr key={i}>
                         <td>{e.category}</td>
                         <td>{e.amount}</td>
+                        <td>
+                          <button className="btn btn-sm btn-danger" onClick={() => deleteExpense(i)}>
+                            🗑️
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
 
                 {expenses.length === 0 && (
-                  <p className="text-center mt-3 text-muted">
-                    No expenses yet
-                  </p>
+                  <p className="text-center mt-3 text-muted">No expenses yet</p>
                 )}
               </div>
             </div>
@@ -172,9 +186,7 @@ function Home() {
                   {["Bus", "Train", "Movie", "Food", "Others"].map((cat) => (
                     <li
                       key={cat}
-                      className={`list-group-item d-flex justify-content-between ${
-                        darkMode ? "dark-list" : ""
-                      }`}
+                      className={`list-group-item d-flex justify-content-between ${darkMode ? "dark-list" : ""}`}
                     >
                       {cat}
                       <span>₹{categoryTotal(cat)}</span>

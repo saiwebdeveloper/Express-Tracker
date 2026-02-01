@@ -13,17 +13,16 @@ function Login() {
       return;
     }
 
-    // ✅ Run reCAPTCHA v3
+    // Run reCAPTCHA v3
     const recaptchaToken = await executeRecaptcha("google_login");
     console.log("reCAPTCHA token:", recaptchaToken);
 
-    // 🔐 Decode Google user
+    // Decode Google JWT
     const user = jwtDecode(credentialResponse.credential);
 
-    // ✅ Store session
+    // Store in sessionStorage
     sessionStorage.setItem("user", JSON.stringify(user));
-
-    // 👉 (Later) send recaptchaToken to backend for verification
+    sessionStorage.setItem("loginTime", new Date().toLocaleString());
 
     navigate("/home");
   };
@@ -48,8 +47,7 @@ function Login() {
         <hr className="my-4" />
 
         <p className="text-center text-muted small mb-0">
-          By signing in, you agree to our{" "}
-          <span className="fw-semibold">Terms</span> &{" "}
+          By signing in, you agree to our <span className="fw-semibold">Terms</span> &{" "}
           <span className="fw-semibold">Privacy Policy</span>
         </p>
       </div>
