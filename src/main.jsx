@@ -10,7 +10,7 @@ import App from "./App";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <GoogleOAuthProvider clientId="655567086137-544t95gr9iun8uimprqdq6k8cklk7q55.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <GoogleReCaptchaProvider
         reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
         scriptProps={{ async: true, defer: true }}
