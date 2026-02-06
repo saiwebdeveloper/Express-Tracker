@@ -12,9 +12,15 @@ function Home() {
   const [category, setCategory] = useState("Bus");
   const [amount, setAmount] = useState("");
   const [expenses, setExpenses] = useState([]);
+  const [error, setError] = useState("");
+
   const [darkMode, setDarkMode] = useState(
     sessionStorage.getItem("darkMode") === "true"
   );
+
+  // Currency formatter (₹ with commas)
+  const formatCurrency = (value) =>
+    `₹${value.toLocaleString("en-IN")}`;
 
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user");
@@ -42,9 +48,26 @@ function Home() {
     sessionStorage.setItem("darkMode", darkMode);
   }, [darkMode]);
 
+  const handleAmountChange = (e) => {
+    const value = Number(e.target.value);
+    setAmount(e.target.value);
+
+    if (!value) {
+      setError("");
+    } else if (value < 1 || value > 20000) {
+      setError("Please enter amount between 1 and 20000");
+    } else {
+      setError("");
+    }
+  };
+
   const addExpense = () => {
     const value = Number(amount);
-    if (!value || value <= 0) return;
+
+    if (value < 1 || value > 20000) {
+      setError("Please enter amount between 1 and 20000");
+      return;
+    }
 
     setExpenses((prev) => [
       ...prev,
@@ -52,11 +75,19 @@ function Home() {
     ]);
 
     setAmount("");
+    setError("");
   };
 
+  // ✅ Confirm before logout
   const logout = () => {
-    sessionStorage.clear();
-    navigate("/");
+    const confirmLogout = window.confirm(
+      "Are you sure you want to logout?"
+    );
+
+    if (confirmLogout) {
+      sessionStorage.clear();
+      navigate("/");
+    }
   };
 
   const total = useMemo(
@@ -97,7 +128,10 @@ function Home() {
               {darkMode ? "☀️" : "🌙"}
             </button>
 
-            <button className="btn btn-outline-danger btn-sm" onClick={logout}>
+            <button
+              className="btn btn-outline-danger btn-sm"
+              onClick={logout}
+            >
               Logout
             </button>
           </div>
@@ -123,17 +157,25 @@ function Home() {
 
                 <input
                   type="number"
-                  className={`form-control mb-3 ${darkMode ? "dark-input" : ""}`}
-                  placeholder="Amount"
+                  min="1"
+                  max="20000"
+                  className={`form-control mb-2 ${darkMode ? "dark-input" : ""}`}
+                  placeholder="Amount (1 - 20000)"
                   value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
+                  onChange={handleAmountChange}
                   onKeyDown={(e) => e.key === "Enter" && addExpense()}
                 />
 
+                {error && (
+                  <small className="text-danger fw-semibold">
+                    {error}
+                  </small>
+                )}
+
                 <button
-                  className="btn btn-primary w-100"
+                  className="btn btn-primary w-100 mt-3"
                   onClick={addExpense}
-                  disabled={!amount || Number(amount) <= 0}
+                  disabled={!amount || error}
                 >
                   Add Expense
                 </button>
@@ -155,14 +197,14 @@ function Home() {
                   <thead>
                     <tr>
                       <th>Category</th>
-                      <th>₹</th>
+                      <th>Amount</th>
                     </tr>
                   </thead>
                   <tbody>
                     {expenses.map((e) => (
                       <tr key={e.id}>
                         <td>{e.category}</td>
-                        <td>{e.amount}</td>
+                        <td>{formatCurrency(e.amount)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -188,13 +230,13 @@ function Home() {
                       className={`list-group-item d-flex justify-content-between ${darkMode ? "dark-list" : ""}`}
                     >
                       {cat}
-                      <span>₹{categoryTotal(cat)}</span>
+                      <span>{formatCurrency(categoryTotal(cat))}</span>
                     </li>
                   ))}
                 </ul>
 
                 <div className="alert alert-success text-center fw-bold">
-                  Total: ₹{total}
+                  Total: {formatCurrency(total)}
                 </div>
               </div>
             </div>
