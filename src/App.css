@@ -46,6 +46,20 @@
   color: #9ca3af !important;
 }
 
+/* 🌙 Dark Footer */
+.dark-footer {
+  background-color: #111827;
+  color: #9ca3af;
+  border-top: 1px solid #1f2933;
+}
+
+/* Light Mode Footer (default) */
+footer.bg-white {
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  color: #6c757d;
+}
+
 /* 📱 Mobile */
 @media (max-width: 576px) {
   h4 {
@@ -63,6 +77,10 @@
   .card-body {
     padding: 0.9rem;
   }
+
+  footer {
+    font-size: 0.75rem;
+  }
 }
 
 /* 📱 Tablet */
@@ -74,4 +92,15 @@
   table {
     font-size: 0.9rem;
   }
+
+  footer {
+    font-size: 0.8rem;
+  }
+}
+
+/* Misc helpers */
+.list-group-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }

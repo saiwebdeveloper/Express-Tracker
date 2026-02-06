@@ -243,6 +243,14 @@ function Home() {
 
           </div>
         </div>
+
+        {/* Footer */}
+        <footer className={`text-center py-3 mt-4 ${darkMode ? "dark-footer" : "bg-white"}`}>
+          <small className={`${darkMode ? "dark-muted" : "text-muted"}`}>
+            © {new Date().getFullYear()} Your App Name. All rights reserved.
+          </small>
+        </footer>
+
       </div>
     </div>
   );
