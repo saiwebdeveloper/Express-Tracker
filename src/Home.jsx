@@ -1,8 +1,9 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Home() {
   const navigate = useNavigate();
+  const tableContainerRef = useRef(null);
 
   // User info
   const [user, setUser] = useState({ name: "", email: "" });
@@ -16,25 +17,22 @@ function Home() {
     sessionStorage.getItem("darkMode") === "true"
   );
 
-  const tableContainerRef = useRef(null);
-
-  // Load user info and expenses
+  // Load user & expenses
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user");
-    const storedTime = sessionStorage.getItem("loginTime");
     if (!storedUser) {
-      navigate("/"); // if not logged in, redirect to login
+      navigate("/");
       return;
     }
 
     setUser(JSON.parse(storedUser));
-    setLoginTime(storedTime || "");
+    setLoginTime(sessionStorage.getItem("loginTime") || "");
 
     const savedExpenses = sessionStorage.getItem("expenses");
     if (savedExpenses) setExpenses(JSON.parse(savedExpenses));
   }, [navigate]);
 
-  // Save expenses & auto-scroll
+  // Persist expenses + auto-scroll
   useEffect(() => {
     sessionStorage.setItem("expenses", JSON.stringify(expenses));
     if (tableContainerRef.current) {
@@ -48,18 +46,17 @@ function Home() {
     sessionStorage.setItem("darkMode", darkMode);
   }, [darkMode]);
 
-  // Add new expense
+  // Add expense
   const addExpense = () => {
-    if (!amount || Number(amount) <= 0) return;
-    setExpenses([...expenses, { category, amount: Number(amount) }]);
-    setAmount("");
-  };
+    const value = Number(amount);
+    if (!value || value <= 0) return;
 
-  // Delete expense
-  const deleteExpense = (index) => {
-    const updated = [...expenses];
-    updated.splice(index, 1);
-    setExpenses(updated);
+    setExpenses((prev) => [
+      ...prev,
+      { id: Date.now(), category, amount: value },
+    ]);
+
+    setAmount("");
   };
 
   // Logout
@@ -68,9 +65,16 @@ function Home() {
     navigate("/");
   };
 
-  const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+  // Memoized totals
+  const total = useMemo(
+    () => expenses.reduce((sum, e) => sum + e.amount, 0),
+    [expenses]
+  );
+
   const categoryTotal = (cat) =>
-    expenses.filter((e) => e.category === cat).reduce((sum, e) => sum + e.amount, 0);
+    expenses
+      .filter((e) => e.category === cat)
+      .reduce((sum, e) => sum + e.amount, 0);
 
   return (
     <div className={`min-vh-100 ${darkMode ? "dark-app" : "bg-light"}`}>
@@ -81,22 +85,19 @@ function Home() {
           <h4 className="fw-bold mb-0">📊 Monthly Expenses</h4>
 
           <div className="d-flex align-items-center gap-3">
-            {/* User info */}
-            <div className="d-flex flex-column text-end me-3">
-              <small className="text-muted">👤 {user.name}</small>
-              <small className="text-muted">📧 {user.email}</small>
-              <small className="text-muted">⏰ Logged in: {loginTime}</small>
+            <div className="text-end">
+              <small className="text-muted">👤 {user.name}</small><br />
+              <small className="text-muted">📧 {user.email}</small><br />
+              <small className="text-muted">⏰ {loginTime}</small>
             </div>
 
-            {/* Theme toggle */}
             <button
               className="btn btn-outline-secondary btn-sm"
-              onClick={() => setDarkMode(!darkMode)}
+              onClick={() => setDarkMode((d) => !d)}
             >
               {darkMode ? "☀️" : "🌙"}
             </button>
 
-            {/* Logout */}
             <button className="btn btn-outline-danger btn-sm" onClick={logout}>
               Logout
             </button>
@@ -106,7 +107,7 @@ function Home() {
         <div className="row g-3">
 
           {/* Add Expense */}
-          <div className="col-12 col-md-4">
+          <div className="col-md-4">
             <div className={`card shadow-sm ${darkMode ? "dark-card" : ""}`}>
               <div className="card-body">
                 <h6 className="fw-semibold mb-3">➕ Add Expense</h6>
@@ -116,11 +117,9 @@ function Home() {
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                 >
-                  <option>Bus</option>
-                  <option>Train</option>
-                  <option>Movie</option>
-                  <option>Food</option>
-                  <option>Others</option>
+                  {["Bus", "Train", "Movie", "Food", "Others"].map((c) => (
+                    <option key={c}>{c}</option>
+                  ))}
                 </select>
 
                 <input
@@ -129,9 +128,14 @@ function Home() {
                   placeholder="Amount"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && addExpense()}
                 />
 
-                <button className="btn btn-primary w-100" onClick={addExpense} disabled={!amount}>
+                <button
+                  className="btn btn-primary w-100"
+                  onClick={addExpense}
+                  disabled={!amount || Number(amount) <= 0}
+                >
                   Add Expense
                 </button>
               </div>
@@ -139,40 +143,36 @@ function Home() {
           </div>
 
           {/* Expense List */}
-          <div className="col-12 col-md-8">
+          <div className="col-md-8">
             <div className={`card shadow-sm ${darkMode ? "dark-card" : ""}`}>
               <div
                 className="card-body"
-                style={{ maxHeight: "300px", overflowY: "auto" }}
                 ref={tableContainerRef}
+                style={{ maxHeight: 300, overflowY: "auto" }}
               >
                 <h6 className="fw-semibold mb-3">🧾 Expenses</h6>
 
-                <table className={`table mb-0 ${darkMode ? "dark-table" : "table-bordered"}`}>
+                <table className={`table ${darkMode ? "dark-table" : "table-bordered"}`}>
                   <thead>
                     <tr>
                       <th>Category</th>
                       <th>₹</th>
-                      <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {expenses.map((e, i) => (
-                      <tr key={i}>
+                    {expenses.map((e) => (
+                      <tr key={e.id}>
                         <td>{e.category}</td>
                         <td>{e.amount}</td>
-                        <td>
-                          <button className="btn btn-sm btn-danger" onClick={() => deleteExpense(i)}>
-                            🗑️
-                          </button>
-                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
 
-                {expenses.length === 0 && (
-                  <p className="text-center mt-3 text-muted">No expenses yet</p>
+                {!expenses.length && (
+                  <p className="text-center mt-3 text-muted">
+                    No expenses yet
+                  </p>
                 )}
               </div>
             </div>
@@ -194,7 +194,7 @@ function Home() {
                   ))}
                 </ul>
 
-                <div className="alert alert-success text-center fw-bold mb-0">
+                <div className="alert alert-success text-center fw-bold">
                   Total: ₹{total}
                 </div>
               </div>
