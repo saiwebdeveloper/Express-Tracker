@@ -36,27 +36,6 @@
 
     <!-- Vite / React entry file -->
     <script type="module" src="/src/main.jsx"></script>
-
-    <!-- Disable right click & keyboard shortcuts (optional) -->
-    <script>
-      // Disable right click
-      document.addEventListener("contextmenu", function (e) {
-        e.preventDefault();
-      });
-
-      // Disable keyboard shortcuts
-      document.addEventListener("keydown", function (e) {
-        if (
-          e.ctrlKey &&
-          (e.key === "c" || e.key === "v" || e.key === "u")
-        ) {
-          e.preventDefault();
-        }
-
-        if (e.key === "F6") {
-          e.preventDefault();
-        }
-      });
-    </script>
+    
   </body>
 </html>
