@@ -18,9 +18,7 @@ function Home() {
     sessionStorage.getItem("darkMode") === "true"
   );
 
-  // Currency formatter (₹ with commas)
-  const formatCurrency = (value) =>
-    `₹${value.toLocaleString("en-IN")}`;
+  const formatCurrency = (value) => `₹${value.toLocaleString("en-IN")}`;
 
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user");
@@ -28,7 +26,6 @@ function Home() {
       navigate("/");
       return;
     }
-
     setUser(JSON.parse(storedUser));
     setLoginTime(sessionStorage.getItem("loginTime") || "");
 
@@ -63,47 +60,32 @@ function Home() {
 
   const addExpense = () => {
     const value = Number(amount);
-
     if (value < 1 || value > 20000) {
       setError("Please enter amount between 1 and 20000");
       return;
     }
 
-    setExpenses((prev) => [
-      ...prev,
-      { id: Date.now(), category, amount: value },
-    ]);
-
+    setExpenses((prev) => [...prev, { id: Date.now(), category, amount: value }]);
     setAmount("");
     setError("");
   };
 
-  // ✅ Confirm before logout
   const logout = () => {
-    const confirmLogout = window.confirm(
-      "Are you sure you want to logout?"
-    );
-
-    if (confirmLogout) {
+    if (window.confirm("Are you sure you want to logout?")) {
       sessionStorage.clear();
       navigate("/");
     }
   };
 
-  const total = useMemo(
-    () => expenses.reduce((sum, e) => sum + e.amount, 0),
-    [expenses]
-  );
-
+  const total = useMemo(() => expenses.reduce((sum, e) => sum + e.amount, 0), [expenses]);
   const categoryTotal = (cat) =>
-    expenses
-      .filter((e) => e.category === cat)
-      .reduce((sum, e) => sum + e.amount, 0);
+    expenses.filter((e) => e.category === cat).reduce((sum, e) => sum + e.amount, 0);
 
   return (
-    <div className={`min-vh-100 ${darkMode ? "dark-app" : "bg-light"}`}>
-      <div className="container py-4">
-
+    <div
+      className={`d-flex flex-column min-vh-100 ${darkMode ? "dark-app" : "bg-light"}`}
+    >
+      <div className="container py-4 flex-grow-1">
         {/* Header */}
         <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
           <h4 className="fw-bold mb-0">📊 Monthly Expenses</h4>
@@ -138,7 +120,6 @@ function Home() {
         </div>
 
         <div className="row g-3">
-
           {/* Add Expense */}
           <div className="col-md-4">
             <div className={`card shadow-sm ${darkMode ? "dark-card" : ""}`}>
@@ -166,11 +147,7 @@ function Home() {
                   onKeyDown={(e) => e.key === "Enter" && addExpense()}
                 />
 
-                {error && (
-                  <small className="text-danger fw-semibold">
-                    {error}
-                  </small>
-                )}
+                {error && <small className="text-danger fw-semibold">{error}</small>}
 
                 <button
                   className="btn btn-primary w-100 mt-3"
@@ -240,18 +217,16 @@ function Home() {
                 </div>
               </div>
             </div>
-
           </div>
         </div>
-
-        {/* Footer */}
-        <footer className={`text-center py-3 mt-4 ${darkMode ? "dark-footer" : "bg-white"}`}>
-          <small className={`${darkMode ? "dark-muted" : "text-muted"}`}>
-            © {new Date().getFullYear()} Your App Name. All rights reserved.
-          </small>
-        </footer>
-
       </div>
+
+      {/* Footer */}
+      <footer className={`text-center py-3 mt-auto ${darkMode ? "dark-footer" : "bg-white"}`}>
+        <small className={`${darkMode ? "dark-muted" : "text-muted"}`}>
+          © {new Date().getFullYear()} Express Tracker All rights reserved.
+        </small>
+      </footer>
     </div>
   );
 }
