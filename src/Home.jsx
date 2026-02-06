@@ -1,15 +1,14 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import "./App.css";
 
 function Home() {
   const navigate = useNavigate();
   const tableContainerRef = useRef(null);
 
-  // User info
   const [user, setUser] = useState({ name: "", email: "" });
   const [loginTime, setLoginTime] = useState("");
 
-  // Expenses & theme
   const [category, setCategory] = useState("Bus");
   const [amount, setAmount] = useState("");
   const [expenses, setExpenses] = useState([]);
@@ -17,7 +16,6 @@ function Home() {
     sessionStorage.getItem("darkMode") === "true"
   );
 
-  // Load user & expenses
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user");
     if (!storedUser) {
@@ -32,7 +30,6 @@ function Home() {
     if (savedExpenses) setExpenses(JSON.parse(savedExpenses));
   }, [navigate]);
 
-  // Persist expenses + auto-scroll
   useEffect(() => {
     sessionStorage.setItem("expenses", JSON.stringify(expenses));
     if (tableContainerRef.current) {
@@ -41,12 +38,10 @@ function Home() {
     }
   }, [expenses]);
 
-  // Persist theme
   useEffect(() => {
     sessionStorage.setItem("darkMode", darkMode);
   }, [darkMode]);
 
-  // Add expense
   const addExpense = () => {
     const value = Number(amount);
     if (!value || value <= 0) return;
@@ -59,13 +54,11 @@ function Home() {
     setAmount("");
   };
 
-  // Logout
   const logout = () => {
     sessionStorage.clear();
     navigate("/");
   };
 
-  // Memoized totals
   const total = useMemo(
     () => expenses.reduce((sum, e) => sum + e.amount, 0),
     [expenses]
@@ -81,14 +74,20 @@ function Home() {
       <div className="container py-4">
 
         {/* Header */}
-        <div className="d-flex justify-content-between align-items-center mb-4">
+        <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
           <h4 className="fw-bold mb-0">📊 Monthly Expenses</h4>
 
-          <div className="d-flex align-items-center gap-3">
-            <div className="text-end">
-              <small className="text-muted">👤 {user.name}</small><br />
-              <small className="text-muted">📧 {user.email}</small><br />
-              <small className="text-muted">⏰ {loginTime}</small>
+          <div className="d-flex align-items-center gap-3 flex-wrap">
+            <div className="text-end header-user">
+              <small className={`text-muted ${darkMode ? "dark-muted" : ""}`}>
+                👤 {user.name}
+              </small><br />
+              <small className={`text-muted ${darkMode ? "dark-muted" : ""}`}>
+                📧 {user.email}
+              </small><br />
+              <small className={`text-muted ${darkMode ? "dark-muted" : ""}`}>
+                ⏰ {loginTime}
+              </small>
             </div>
 
             <button
@@ -170,7 +169,7 @@ function Home() {
                 </table>
 
                 {!expenses.length && (
-                  <p className="text-center mt-3 text-muted">
+                  <p className={`text-center mt-3 text-muted ${darkMode ? "dark-muted" : ""}`}>
                     No expenses yet
                   </p>
                 )}

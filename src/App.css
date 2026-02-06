@@ -45,3 +45,33 @@
 .dark-muted {
   color: #9ca3af !important;
 }
+
+/* 📱 Mobile */
+@media (max-width: 576px) {
+  h4 {
+    font-size: 1.1rem;
+  }
+
+  table {
+    font-size: 0.85rem;
+  }
+
+  .header-user {
+    text-align: left !important;
+  }
+
+  .card-body {
+    padding: 0.9rem;
+  }
+}
+
+/* 📱 Tablet */
+@media (min-width: 577px) and (max-width: 768px) {
+  h4 {
+    font-size: 1.25rem;
+  }
+
+  table {
+    font-size: 0.9rem;
+  }
+}
