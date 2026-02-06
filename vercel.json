@@ -1,6 +1,9 @@
 {
   "routes": [
     {
+      "handle": "filesystem"
+    },
+    {
       "src": "^/sitemap.xml$",
       "headers": {
         "Content-Type": "application/xml"
